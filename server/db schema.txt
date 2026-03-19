@@ -1,0 +1,50 @@
+-- Barangays
+create table barangays (
+  id text primary key,
+  name text not null,
+  is_dormant boolean default false,
+  annual_budget numeric default 180000,
+  created_at timestamptz default now()
+);
+
+-- Programs
+create table programs (
+  id uuid primary key default gen_random_uuid(),
+  barangay_id text references barangays(id),
+  name text not null,
+  category text check (category in ('Health','Sports','Livelihood','Environment','Culture')),
+  budget numeric not null,
+  date date not null,
+  description text,
+  status text default 'pending' check (status in ('pending','verified','flagged')),
+  verifications int default 0,
+  flags int default 0,
+  photo_url text,
+  created_at timestamptz default now()
+);
+
+-- Votes (1 per user per program)
+create table votes (
+  id uuid primary key default gen_random_uuid(),
+  program_id uuid references programs(id) on delete cascade,
+  voter_id text not null,
+  vote_type text check (vote_type in ('verify','flag')),
+  created_at timestamptz default now(),
+  unique(program_id, voter_id)
+);
+
+-- Comments
+create table comments (
+  id uuid primary key default gen_random_uuid(),
+  program_id uuid references programs(id) on delete cascade,
+  author text not null,
+  role text not null,
+  text text not null,
+  date timestamptz default now()
+);
+
+-- Seed barangays
+insert into barangays (id, name, is_dormant, annual_budget) values
+  ('brgy-1', 'Poblacion', false, 180000),
+  ('brgy-2', 'San Jose', false, 180000),
+  ('brgy-3', 'Rizal', true, 180000);
