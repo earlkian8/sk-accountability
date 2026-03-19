@@ -10,10 +10,7 @@ const PORT = process.env.PORT || 3001;
 
 // --- Middleware ---
 app.use(helmet());
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'], // your Vite dev server
-  methods: ['GET', 'POST', 'DELETE', 'PATCH'],
-}));
+app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
