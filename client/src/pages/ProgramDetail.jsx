@@ -5,7 +5,7 @@ import { StatusBadge } from '../components/StatusBadge'
 import { CategoryTag }  from '../components/CategoryIcon'
 import toast from 'react-hot-toast'
 import { ArrowLeft, CheckCircle2, Flag, Calendar, ImageIcon, Send, User, PhilippinePeso } from 'lucide-react'
-
+import skLogo from '../assets/sk-logo.svg'
 export function ProgramDetail({ program, onBack }) {
   const { vote, userRole, programs } = useAppStore()
   const live = programs.find(p => p.id === program.id) || program
@@ -55,7 +55,8 @@ export function ProgramDetail({ program, onBack }) {
             <ArrowLeft size={14} /> Bumalik
           </button>
           <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.2)' }} />
-          <span style={{ fontFamily: 'Syne', fontWeight: 800, fontSize: 16, color: 'white', letterSpacing: '-0.01em' }}>SKCheck</span>
+          <span style={{ fontFamily: 'Syne', fontWeight: 800, fontSize: 16, color: 'white', letterSpacing: '-0.01em' }}>
+            SKCheck</span>
         </div>
       </header>
 

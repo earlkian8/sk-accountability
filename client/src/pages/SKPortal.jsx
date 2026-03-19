@@ -3,7 +3,7 @@ import { useAppStore } from '../store/appStore'
 import { createProgram, uploadPhoto } from '../api/client'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Upload, CheckCircle, Loader2, Shield, ImagePlus, X } from 'lucide-react'
-
+import skLogo from '../assets/sk-logo.svg'
 const CATEGORIES = ['Health', 'Sports', 'Livelihood', 'Environment', 'Culture']
 
 export function SKPortal({ onBack }) {
@@ -68,7 +68,11 @@ export function SKPortal({ onBack }) {
             </button>
             <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.2)' }} />
             <span style={{ fontFamily: 'Syne', fontWeight: 800, fontSize: 15, color: 'white', display: 'flex', alignItems: 'center', gap: 7 }}>
-              <Shield size={15} /> SK Official Portal
+              <img
+  src={skLogo}
+  alt="Sangguniang Kabataan"
+  style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'contain', background: 'white', padding: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.15)', flexShrink: 0 }}
+/> SK Official Portal
             </span>
           </div>
           <select value={userRole} onChange={e => setUserRole(e.target.value)} style={{

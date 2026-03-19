@@ -3,7 +3,7 @@ import { useAppStore } from '../store/appStore'
 import { BudgetBar }   from '../components/BudgetBar'
 import { ProgramCard } from '../components/ProgramCard'
 import { AlertTriangle, Loader2, Plus, Shield, Users, Eye } from 'lucide-react'
-
+import skLogo from '../assets/sk-logo.svg'
 const ROLES = [
   { value: 'public',      label: 'Bisita',      icon: Eye,    desc: 'View only' },
   { value: 'kk-member',   label: 'KK Member',   icon: Users,  desc: 'Can verify & flag' },
@@ -43,13 +43,11 @@ export function Dashboard({ onProgramClick, onGoToPortal }) {
 
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{
-              width: 38, height: 38, borderRadius: 10, background: 'white',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            }}>
-              <span style={{ fontFamily: 'Syne', fontWeight: 900, fontSize: 13, color: 'var(--blue)', letterSpacing: '-0.03em' }}>SK</span>
-            </div>
+            <img
+                src={skLogo}
+                alt="Sangguniang Kabataan"
+                style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'contain', background: 'white', padding: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.15)', flexShrink: 0 }}
+            />
             <div>
               <div style={{ fontFamily: 'Syne', fontWeight: 800, fontSize: 18, color: 'white', lineHeight: 1, letterSpacing: '-0.02em' }}>SKCheck</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 500, marginTop: 1 }}>Sangguniang Kabataan Accountability</div>
