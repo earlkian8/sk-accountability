@@ -1,34 +1,33 @@
+/**
+ * src/store/appStore.js
+ */
 import { create } from 'zustand'
 import {
-  fetchRegions,
-  fetchProvinces,
-  fetchCities,
-  fetchBarangays,
-  fetchPrograms,
-  castVote as apiCastVote,
+  fetchRegions, fetchProvinces, fetchCities,
+  fetchBarangays, fetchPrograms, castVote as apiCastVote,
 } from '../api/client'
 
 export const useAppStore = create((set, get) => ({
   // ── Address hierarchy ──
-  regions: [],
+  regions:   [],
   provinces: [],
-  cities: [],
+  cities:    [],
   barangays: [],
 
-  selectedRegion: null,      // { code, name }
+  selectedRegion:   null,
   selectedProvince: null,
-  selectedCity: null,
-  selectedBarangay: null,    // { code, name } — the "barangay" used as barangayId
+  selectedCity:     null,
+  selectedBarangay: null,
 
   // ── Programs ──
   programs: [],
-  loading: false,
+  loading:  false,
   loadingAddress: false,
-  error: null,
+  error:    null,
 
   // ── Role ──
   userRole: 'public',
-  voterId: `voter-${Math.random().toString(36).slice(2, 9)}`,
+  voterId:  `voter-${Math.random().toString(36).slice(2, 9)}`,
 
   // ── Actions ──
   setUserRole: (role) => set({ userRole: role }),
@@ -83,8 +82,19 @@ export const useAppStore = create((set, get) => ({
     }
   },
 
+  // ── Program mutations ──
   addProgram: (program) =>
     set(state => ({ programs: [program, ...state.programs] })),
+
+  updateProgramInStore: (updated) =>
+    set(state => ({
+      programs: state.programs.map(p => p.id === updated.id ? updated : p)
+    })),
+
+  removeProgramFromStore: (id) =>
+    set(state => ({
+      programs: state.programs.filter(p => p.id !== id)
+    })),
 
   vote: async (programId, type) => {
     const { voterId } = get()
