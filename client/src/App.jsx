@@ -1,33 +1,68 @@
+/**
+ * src/App.jsx
+ * Root app with AI panel + toggle button integrated
+ */
+
 import { useState } from 'react'
 import { Toaster } from 'react-hot-toast'
-import { Dashboard }     from './pages/Dashboard'
-import { ProgramDetail } from './pages/ProgramDetail'
-import { SKPortal }      from './pages/SKPortal'
+import { Dashboard }       from './pages/Dashboard'
+import { ProgramDetail }   from './pages/ProgramDetail'
+import { SKPortal }        from './pages/SKPortal'
+import { AIPanel }         from './components/AIPanel'
+import { AIToggleButton }  from './components/AIToggleButton'
 
 export default function App() {
-  const [view, setView] = useState('dashboard')
+  const [page, setPage] = useState('dashboard') // 'dashboard' | 'detail' | 'portal'
   const [selectedProgram, setSelectedProgram] = useState(null)
+  const [aiOpen, setAiOpen] = useState(false)
+
+  const handleProgramClick = (program) => {
+    setSelectedProgram(program)
+    setPage('detail')
+  }
+
+  const handleBack = () => {
+    setSelectedProgram(null)
+    setPage('dashboard')
+  }
+
+  const handleGoToPortal = () => setPage('portal')
 
   return (
     <>
-      <Toaster position="top-center" toastOptions={{
-        style: { fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 14, borderRadius: 10 },
-        success: { style: { borderLeft: '3px solid #16a34a' } },
-        error:   { style: { borderLeft: '3px solid #ce1126' } },
-      }} />
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: { fontSize: 13, fontWeight: 600, borderRadius: 10 },
+          duration: 3000,
+        }}
+      />
 
-      {view === 'detail' && selectedProgram && (
-        <ProgramDetail program={selectedProgram} onBack={() => { setView('dashboard'); setSelectedProgram(null) }} />
-      )}
-      {view === 'portal' && (
-        <SKPortal onBack={() => setView('dashboard')} />
-      )}
-      {view === 'dashboard' && (
+      {/* Pages */}
+      {page === 'dashboard' && (
         <Dashboard
-          onProgramClick={p => { setSelectedProgram(p); setView('detail') }}
-          onGoToPortal={() => setView('portal')}
+          onProgramClick={handleProgramClick}
+          onGoToPortal={handleGoToPortal}
         />
       )}
+      {page === 'detail' && selectedProgram && (
+        <ProgramDetail
+          program={selectedProgram}
+          onBack={handleBack}
+        />
+      )}
+      {page === 'portal' && (
+        <SKPortal onBack={handleBack} />
+      )}
+
+      {/* AI Panel (renders on all pages) */}
+      <AIPanel isOpen={aiOpen} onClose={() => setAiOpen(false)} />
+
+      {/* Floating toggle button */}
+      <AIToggleButton
+        isOpen={aiOpen}
+        onClick={() => setAiOpen(prev => !prev)}
+      />
     </>
   )
 }
