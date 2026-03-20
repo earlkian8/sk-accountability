@@ -5,13 +5,27 @@ const api = axios.create({
   timeout: 10000,
 })
 
-// ── Barangays ──────────────────────────────────────────
-export const fetchBarangays = () =>
-  api.get('/barangays').then(r => r.data)
+const psgc = axios.create({
+  baseURL: 'https://psgc.cloud/api',
+  timeout: 10000,
+})
+
+// ── PSGC Philippine Address ────────────────────────────
+export const fetchRegions = () =>
+  psgc.get('/regions').then(r => r.data)
+
+export const fetchProvinces = (regionCode) =>
+  psgc.get(`/regions/${regionCode}/provinces`).then(r => r.data)
+
+export const fetchCities = (provinceCode) =>
+  psgc.get(`/provinces/${provinceCode}/cities-municipalities`).then(r => r.data)
+
+export const fetchBarangays = (cityCode) =>
+  psgc.get(`/cities-municipalities/${cityCode}/barangays`).then(r => r.data)
 
 // ── Programs ───────────────────────────────────────────
-export const fetchPrograms = (barangayId) =>
-  api.get('/programs', { params: { barangayId } }).then(r => r.data)
+export const fetchPrograms = (barangayCode) =>
+  api.get('/programs', { params: { barangayId: barangayCode } }).then(r => r.data)
 
 export const fetchProgramById = (id) =>
   api.get(`/programs/${id}`).then(r => r.data)

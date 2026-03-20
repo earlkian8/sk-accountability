@@ -1,43 +1,85 @@
 import { create } from 'zustand'
 import {
+  fetchRegions,
+  fetchProvinces,
+  fetchCities,
   fetchBarangays,
   fetchPrograms,
   castVote as apiCastVote,
 } from '../api/client'
 
 export const useAppStore = create((set, get) => ({
-  // ── State ──
+  // ── Address hierarchy ──
+  regions: [],
+  provinces: [],
+  cities: [],
   barangays: [],
+
+  selectedRegion: null,      // { code, name }
+  selectedProvince: null,
+  selectedCity: null,
+  selectedBarangay: null,    // { code, name } — the "barangay" used as barangayId
+
+  // ── Programs ──
   programs: [],
-  selectedBarangayId: null,
-  userRole: 'public',   // 'public' | 'kk-member' | 'sk-official'
-  voterId: `voter-${Math.random().toString(36).slice(2, 9)}`, // anonymous session id
   loading: false,
+  loadingAddress: false,
   error: null,
+
+  // ── Role ──
+  userRole: 'public',
+  voterId: `voter-${Math.random().toString(36).slice(2, 9)}`,
 
   // ── Actions ──
   setUserRole: (role) => set({ userRole: role }),
 
-  setSelectedBarangayId: async (id) => {
-    set({ selectedBarangayId: id, loading: true })
+  loadRegions: async () => {
+    set({ loadingAddress: true })
     try {
-      const programs = await fetchPrograms(id)
-      set({ programs, loading: false })
+      const regions = await fetchRegions()
+      set({ regions, loadingAddress: false })
     } catch (e) {
-      set({ error: e.message, loading: false })
+      set({ error: e.message, loadingAddress: false })
     }
   },
 
-  loadBarangays: async () => {
+  selectRegion: async (region) => {
+    set({ selectedRegion: region, selectedProvince: null, selectedCity: null, selectedBarangay: null, provinces: [], cities: [], barangays: [], programs: [], loadingAddress: true })
     try {
-      const barangays = await fetchBarangays()
-      set({ barangays })
-      // Auto-select first barangay
-      if (barangays.length && !get().selectedBarangayId) {
-        get().setSelectedBarangayId(barangays[0].id)
-      }
+      const provinces = await fetchProvinces(region.code)
+      set({ provinces, loadingAddress: false })
     } catch (e) {
-      set({ error: e.message })
+      set({ error: e.message, loadingAddress: false })
+    }
+  },
+
+  selectProvince: async (province) => {
+    set({ selectedProvince: province, selectedCity: null, selectedBarangay: null, cities: [], barangays: [], programs: [], loadingAddress: true })
+    try {
+      const cities = await fetchCities(province.code)
+      set({ cities, loadingAddress: false })
+    } catch (e) {
+      set({ error: e.message, loadingAddress: false })
+    }
+  },
+
+  selectCity: async (city) => {
+    set({ selectedCity: city, selectedBarangay: null, barangays: [], programs: [], loadingAddress: true })
+    try {
+      const barangays = await fetchBarangays(city.code)
+      set({ barangays, loadingAddress: false })
+    } catch (e) {
+      set({ error: e.message, loadingAddress: false })
+    }
+  },
+
+  selectBarangay: async (barangay) => {
+    set({ selectedBarangay: barangay, loading: true, programs: [] })
+    try {
+      const programs = await fetchPrograms(barangay.code)
+      set({ programs, loading: false })
+    } catch (e) {
+      set({ error: e.message, loading: false })
     }
   },
 
@@ -56,7 +98,6 @@ export const useAppStore = create((set, get) => ({
         )
       }))
     } catch (e) {
-      // 409 = already voted — surface to UI via toast
       throw e
     }
   },

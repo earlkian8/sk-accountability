@@ -218,3 +218,91 @@ body {
 .badge-flagged  { background: var(--red-light);     color: var(--red);    }
 .badge-dormant  { background: var(--orange-light);  color: var(--orange); }
 .badge-blue     { background: var(--blue-light);    color: var(--blue);   }
+
+/* Utility: hide on mobile (< 640px) */
+@media (max-width: 640px) {
+  .hidden-mobile { display: none !important; }
+}
+ 
+/* Utility: show only on mobile */
+.show-mobile { display: none !important; }
+@media (max-width: 640px) {
+  .show-mobile { display: inline !important; }
+}
+ 
+/* ── Header role selector — stack on very small screens ── */
+@media (max-width: 400px) {
+  /* Shrink role pills further */
+  .role-pill-btn { padding: 5px 7px !important; }
+}
+ 
+/* ── Main content padding ── */
+@media (max-width: 640px) {
+  main {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+ 
+/* ── Address selector grid ── */
+/* On mobile: 1 column, on tablet: 2 col, on desktop: 4 col (already auto-fit) */
+@media (max-width: 480px) {
+  .address-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+ 
+/* ── Stats + Budget grid ── */
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Stat pills go horizontal on mobile */
+  .stat-pills {
+    flex-direction: row !important;
+    min-width: unset !important;
+  }
+  .stat-pill {
+    flex: 1;
+    flex-direction: row !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+    padding: 10px 12px !important;
+  }
+}
+ 
+/* ── Program cards: full-width on small mobile ── */
+@media (max-width: 360px) {
+  .programs-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+ 
+/* ── ProgramDetail: reduce padding on mobile ── */
+@media (max-width: 640px) {
+  .detail-title { font-size: 20px !important; }
+  .detail-card  { padding: 18px !important; }
+  .verify-grid  { grid-template-columns: 1fr 1fr !important; }
+}
+ 
+/* ── SKPortal form grid ── */
+@media (max-width: 480px) {
+  .portal-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+ 
+/* ── BudgetBar: tighten on mobile ── */
+@media (max-width: 480px) {
+  .budget-legend {
+    gap: 10px !important;
+  }
+}
+ 
+/* ── Breadcrumb wrapping ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}

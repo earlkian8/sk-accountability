@@ -1,6 +1,6 @@
 const { supabase } = require('../services/supabaseClient');
 
-// GET /api/programs?barangayId=brgy-1
+// GET /api/programs?barangayId=<psgc_code>
 async function getPrograms(req, res) {
   const { barangayId } = req.query;
 
@@ -19,9 +19,7 @@ async function getPrograms(req, res) {
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
 
-  // Map to camelCase for frontend compatibility
-  const mapped = data.map(mapProgram);
-  res.json(mapped);
+  res.json(data.map(mapProgram));
 }
 
 // GET /api/programs/:id
@@ -40,7 +38,11 @@ async function getProgramById(req, res) {
 
 // POST /api/programs
 async function createProgram(req, res) {
-  const { name, category, budget, date, description, barangayId, photoUrl } = req.body;
+  const {
+    name, category, budget, date, description,
+    barangayId, barangayName, cityName, provinceName, regionName,
+    photoUrl,
+  } = req.body;
 
   if (!name || !category || !budget || !date || !barangayId) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -55,6 +57,10 @@ async function createProgram(req, res) {
       date,
       description,
       barangay_id: barangayId,
+      barangay_name: barangayName || null,
+      city_name: cityName || null,
+      province_name: provinceName || null,
+      region_name: regionName || null,
       photo_url: photoUrl || null,
       status: 'pending',
       verifications: 0,
@@ -75,7 +81,7 @@ async function deleteProgram(req, res) {
   res.json({ success: true });
 }
 
-// Helper: maps DB snake_case to frontend camelCase
+// Helper: snake_case → camelCase
 function mapProgram(p) {
   return {
     id: p.id,
@@ -88,6 +94,10 @@ function mapProgram(p) {
     verifications: p.verifications,
     flags: p.flags,
     barangayId: p.barangay_id,
+    barangayName: p.barangay_name,
+    cityName: p.city_name,
+    provinceName: p.province_name,
+    regionName: p.region_name,
     photoUrl: p.photo_url,
     comments: (p.comments || []).map(c => ({
       id: c.id,

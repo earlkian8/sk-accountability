@@ -6,22 +6,8 @@ const { castVote } = require('../controllers/voteController');
 const { addComment, getComments } = require('../controllers/commentController');
 const { upload, uploadFile } = require('../controllers/uploadController');
 
-// --- Barangays ---
-const { supabase } = require('../services/supabaseClient');
-router.get('/barangays', async (req, res) => {
-  const { data, error } = await supabase
-    .from('barangays')
-    .select('*')
-    .order('name');
-  if (error) return res.status(500).json({ error: error.message });
-  const mapped = data.map(b => ({
-    id: b.id,
-    name: b.name,
-    isDormant: b.is_dormant,
-    annualBudget: b.annual_budget,
-  }));
-  res.json(mapped);
-});
+// Barangay data is now served by PSGC Cloud (https://psgc.cloud/api)
+// No local barangays table or route needed.
 
 // --- Programs ---
 router.get('/programs', getPrograms);
