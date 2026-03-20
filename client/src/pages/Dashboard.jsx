@@ -125,7 +125,7 @@ export function Dashboard({ onProgramClick, onGoToPortal }) {
             gridTemplateColumns: 'minmax(0,1fr) auto',
             gap: 16, alignItems: 'start',
           }} className="stats-grid">
-            <BudgetBar allocated={180000} reported={reported} verified={verified} />
+            <BudgetBar barangayCode={selectedBarangay?.code} reported={reported} verified={verified} />
 
             {/* Stat pills */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 110 }}>

@@ -1,7 +1,32 @@
-export function BudgetBar({ allocated, reported, verified }) {
-  const rPct = Math.min((reported  / allocated) * 100, 100)
-  const vPct = Math.min((verified  / allocated) * 100, 100)
-  const fmt  = n => `₱${Number(n).toLocaleString()}`
+/**
+ * src/components/BudgetBar.jsx
+ */
+import { useEffect, useState } from 'react'
+import { getBarangayBudget } from '../api/client'
+
+export function BudgetBar({ barangayCode, reported, verified }) {
+  const [allocated, setAllocated] = useState(0)
+  const [tenPct, setTenPct]       = useState(0)
+  const [loading, setLoading]     = useState(true)
+
+  useEffect(() => {
+    if (!barangayCode) { setLoading(false); return }
+    setLoading(true)
+    getBarangayBudget(barangayCode)
+      .then(data => {
+        setAllocated(data.annualBudget    || 0)
+        setTenPct(data.tenPercentBudget   || 0)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [barangayCode])
+
+  const fmt = n => `₱${Number(n).toLocaleString()}`
+
+  // Guard against divide-by-zero
+  const base      = allocated || 1
+  const rPct      = Math.min((reported / base) * 100, 100)
+  const vPct      = Math.min((verified / base) * 100, 100)
   const remaining = Math.max(allocated - reported, 0)
 
   return (
@@ -10,37 +35,52 @@ export function BudgetBar({ allocated, reported, verified }) {
         <div>
           <p className="label-caps" style={{ marginBottom: 4 }}>Annual Budget</p>
           <p className="display" style={{ fontSize: 28, color: 'var(--blue)' }}>
-            {fmt(allocated)}
+            {loading ? '—' : allocated ? fmt(allocated) : 'Hindi pa na-set'}
           </p>
+          {tenPct > 0 && (
+            <p style={{ fontSize: 11, color: 'var(--gray-400)', marginTop: 3, fontWeight: 500 }}>
+              10% SK Fund: {fmt(tenPct)}
+            </p>
+          )}
         </div>
         <div style={{ textAlign: 'right' }}>
           <p className="label-caps" style={{ marginBottom: 4 }}>Reported</p>
           <p style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Syne', color: 'var(--gray-900)' }}>
-            {rPct.toFixed(0)}%
+            {allocated ? `${rPct.toFixed(0)}%` : '—'}
           </p>
         </div>
       </div>
 
-      {/* Stacked bar */}
-      <div style={{ position: 'relative', height: 10, background: 'var(--gray-100)', borderRadius: 99, overflow: 'hidden', marginBottom: 16 }}>
+      {/* Stacked progress bar */}
+      <div style={{
+        position: 'relative', height: 10,
+        background: 'var(--gray-100)', borderRadius: 99,
+        overflow: 'hidden', marginBottom: 16,
+      }}>
+        {/* Reported bar (lighter blue) */}
         <div style={{
           position: 'absolute', left: 0, top: 0, bottom: 0,
-          width: `${rPct}%`, background: 'var(--blue-light)',
-          borderRadius: 99, transition: 'width 1s cubic-bezier(0.16,1,0.3,1)',
+          width: `${rPct}%`,
+          background: '#93c5fd', // blue-300 — visible on white
+          borderRadius: 99,
+          transition: 'width 1s cubic-bezier(0.16,1,0.3,1)',
         }} />
+        {/* Verified bar (solid blue on top) */}
         <div style={{
           position: 'absolute', left: 0, top: 0, bottom: 0,
-          width: `${vPct}%`, background: 'var(--blue)',
-          borderRadius: 99, transition: 'width 1s cubic-bezier(0.16,1,0.3,1)',
+          width: `${vPct}%`,
+          background: 'var(--blue)',
+          borderRadius: 99,
+          transition: 'width 1s cubic-bezier(0.16,1,0.3,1)',
         }} />
       </div>
 
       {/* Legend */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
         {[
-          { dot: 'var(--blue)',       label: 'Community Verified', val: fmt(verified) },
-          { dot: 'var(--blue-light)', label: 'Reported',           val: fmt(reported),  border: '1px solid var(--blue)' },
-          { dot: 'var(--gray-200)',   label: 'Unreported',         val: fmt(remaining), border: '1px solid var(--gray-300)' },
+          { dot: 'var(--blue)',  label: 'Community Verified', val: fmt(verified) },
+          { dot: '#93c5fd',     label: 'Reported',           val: fmt(reported) },
+          { dot: 'var(--gray-200)', label: 'Unreported',     val: fmt(remaining), border: '1px solid var(--gray-300)' },
         ].map(({ dot, label, val, border }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 10, height: 10, borderRadius: 3, background: dot, border, display: 'inline-block', flexShrink: 0 }} />
@@ -49,6 +89,12 @@ export function BudgetBar({ allocated, reported, verified }) {
           </div>
         ))}
       </div>
+
+      {!loading && !allocated && (
+        <p style={{ fontSize: 11, color: 'var(--gray-400)', marginTop: 12, textAlign: 'center' }}>
+          I-set ang budget sa SK Admin Portal → Budget Settings
+        </p>
+      )}
     </div>
   )
 }
